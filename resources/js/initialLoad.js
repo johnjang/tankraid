@@ -37,13 +37,4 @@ function loadImages(imgAddress, callBackFunction, returnObject) {
         return true;
     }
 
-
-
 }
-
-var address = "resources/sprites.png";
-var img = new Image();
-img.onload = function() {
-    console.log("loaded");
-};
-img.src = address;
