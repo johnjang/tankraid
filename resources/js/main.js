@@ -3,6 +3,7 @@
 var imageObjects = {};
 var imgAddress = [];
 var enemySprites = [];
+var bulletSprites = [];
 var user = {
     image : 0,
     sprite : 0,
@@ -22,6 +23,7 @@ function loadResources() {
         "resources/images/mainTank.bmp",
         "resources/images/enemyTank.bmp",
         "resources/images/cursor.bmp"
+
     ];
     loadImages(imgAddress, loadGame, imageObjects);
 
@@ -35,13 +37,13 @@ function loadGame() {
     user["image"] = imageObjects["resources/images/mainTank.bmp"];
     level = 0;  //initial level 0. Level increases every frame.
    
-    user.sprite = new Sprite(user.image, [41,41], 0, 81, 'S');
+    user.sprite = new Sprite(user.image, [238,367], 0, 81, 'S');
 
     var enemyTank = imageObjects["resources/images/enemyTank.bmp"];
-//    enemySprites.push(new Sprite(enemyTank, [400, 200], 20, 41, 'N'));
-//    enemySprites.push(new Sprite(enemyTank, [0, 0], 10, 41, 'S'));
-//    enemySprites.push(new Sprite(enemyTank, [400, 200], 30, 41, 'E'));
-//    enemySprites.push(new Sprite(enemyTank, [400, 200], 20, 41, 'W'));
+    enemySprites.push(new Sprite(enemyTank, [228, 103], 30, 41, 'N', null));
+    enemySprites.push(new Sprite(enemyTank, [100, 20], 10, 41, 'S', null));
+    enemySprites.push(new Sprite(enemyTank, [300, 200], 100, 41, 'E', null));
+    enemySprites.push(new Sprite(enemyTank, [400, 200], 200, 41, 'W', null));
     loop();
 }
 
@@ -55,7 +57,7 @@ function renderBackground() {
     ctx.fillRect(0, 0, canvas.width, canvas.height-50);
 
     ctx.fillStyle = ctx.createPattern(menuPanel, 'repeat');
-    ctx.fillRect(0, 0+canvas.height-120, canvas.width, canvas.height-50);
+    ctx.fillRect(0, 0+canvas.height-50, canvas.width, canvas.height);
     
     var cursorImg = imageObjects["resources/images/cursor.bmp"];
     ctx.drawImage(cursorImg, cursor["xPos"]-cursorImg.width, 
@@ -67,58 +69,80 @@ function renderBackground() {
 
 function updateUser(dtr) {
     var userSpeed = 50;
+    var bulletSpeed = 200;
     if(input.isDown('LEFT') == true) {
         user.sprite.dir = 'W';
-        user.sprite.speed = userSpeed;
+        user.sprite.position[0] -= dtr*userSpeed;
     }
-    else if(input.isDown('RIGHT') == true) {
+    if(input.isDown('RIGHT') == true) {
         user.sprite.dir = 'E';
-        user.sprite.speed = userSpeed;
+        user.sprite.position[0] += dtr*userSpeed;
     }
-    else if(input.isDown('DOWN') == true) {
+    if(input.isDown('DOWN') == true) {
         user.sprite.dir = 'S';
-        user.sprite.speed = userSpeed;
+        user.sprite.position[1] += dtr*userSpeed;
     }
-    else if(input.isDown('UP') == true) {
+    if(input.isDown('UP') == true) {
         user.sprite.dir = 'N';
-        user.sprite.speed = userSpeed;
+        user.sprite.position[1] -= dtr*userSpeed;
     }
-    else if(input.isDown('SPACE') == true) {
-        console.log("fire shot");
-    }
-    else if(input.isDown('1') == true) {
+    if(input.isDown('1') == true) {
         console.log("fire shot 1");
     }
-    else if(input.isDown('2') == true) {
+    if(input.isDown('2') == true) {
         console.log("fire shot 2");
     }
-    else if(input.isDown('3') == true) {
+    if(input.isDown('3') == true) {
         console.log("fire shot 3");
     }
-    else if(input.isDown('4') == true) {
+    if(input.isDown('4') == true) {
         console.log("fire shot 4");
     }
     else {
-        user.sprite.speed = 0;
+
     }
-    user.sprite.updateLocation(dtr);
     user.sprite.render(ctx);
 
     if(cursor["click"] == true) {
         console.log("fired, x:y = " + cursor["cxPos"] +
                        ":" + cursor["cyPos"]);
+        console.log("fire shot");
+    //    var bullet = new Sprite("resources/images/cursor.bmp",
+    //                                [user.position[0], user.position[1]],
+    //                                bulletSpeed, 5,'');
+    //    bulletSprites.add(bullet);
     }
 
 }
 
+
+//a function to shoot from sprite's current position
+// sprite: Sprite object (the missile)
+// img: missile img
+// destination: x,y coordinates
+function shootFire(sprite, destination){
+    var sx = sprites.position[0];
+    var sy = sprites.position[1];
+    var dx = destination[0];
+    var dy = destination[1];
+
+    var xx = Math.pow((dx-sx), 2);
+    var yy = Math.pow((dy-sy), 2);
+    var di = Math.sqrt(xx+yy);
+    var mv = di/sprite.speed;
+    
+    sprite.position[0] = Math.floor((dx-sx)/mv);
+    sprite.position[1] = Math.floor((dy-sy)/mv);
+
+}
+
 function update(dtr) {
-    console.log("updating");
     renderBackground();
    
     updateUser(dtr);
     //updating enemy sprites
     for(var i=0; i<enemySprites.length; i++) {
-        enemySprites[i].updateLocation(dtr);
+        enemySprites[i].updateLocation2(dtr);
         enemySprites[i].render(ctx);
     }
     //making enemy sprites

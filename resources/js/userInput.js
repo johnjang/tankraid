@@ -6,6 +6,14 @@ canvas.height = 550;
 canvas.style.cursor = "none";
 document.body.appendChild(canvas);
 
+var generateRandomPoint = function() {
+    var xPos = Math.random() * canvas.width-20; //random xPos inside a canvas
+    var yPos = Math.random() * canvas.height-20;    //random yPos inside a canvas
+    xPos = Math.floor(xPos);
+    yPos = Math.floor(yPos);
+    return [xPos, yPos];
+};
+
 
 (function() {
     window.cursor = {
