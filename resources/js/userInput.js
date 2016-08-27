@@ -1,9 +1,38 @@
-//file responsible for user input. 
-//It will load event handlers.
-//
-//List of keys to listen:
-//  w/W: up, a/A: left, d/D: right, s/S: down
-//  space: shoot, 1~4: weapon selection
+//create a canvas for the game
+var canvas = document.createElement("canvas");
+var ctx = canvas.getContext("2d");
+canvas.width = 1100;
+canvas.height = 550;
+canvas.style.cursor = "none";
+document.body.appendChild(canvas);
+
+
+(function() {
+    window.cursor = {
+        xPos:0, //current mouse pos-xaxis
+        yPos:0, //current mouse pos-yaxis
+        click:false, //if user is clicking, it is true
+        cxPos:0, //click mouse pos-xaxis
+        cyPos:0  //click mouse pos-yaxis
+    }
+
+    canvas.addEventListener("mousemove", function(e) {
+        cursor["xPos"] = e.clientX;
+        cursor["yPos"] = e.clientY;
+    }, false);
+    canvas.addEventListener("mousedown", function(e) {
+        var rect = canvas.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+        cursor["cxPos"] = x; 
+        cursor["cyPos"] = y; 
+        cursor["click"] = true;
+    }, false);
+    canvas.addEventListener("mouseup", function(e) {
+        cursor["click"] = false;
+    }, false);
+
+})();
 
 (function() {
     var pressedKeys = {};
