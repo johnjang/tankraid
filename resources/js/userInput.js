@@ -3,7 +3,7 @@ var canvas = document.createElement("canvas");
 var ctx = canvas.getContext("2d");
 canvas.width = 1100;
 canvas.height = 550;
-canvas.style.cursor = "none";
+//canvas.style.cursor = "none";
 var boundary = [[0,0],[canvas.width,canvas.height]];
 document.body.appendChild(canvas);
 
@@ -64,13 +64,13 @@ var generateRandomPoint = function() {
             case 49:
                 key = '1'; 
                 break;
-            case 51:
+            case 50:
                 key = '2'; 
                 break;
-            case 52:
+            case 51:
                 key = '3'; 
                 break;
-            case 53:
+            case 52:
                 key = '4'; 
                 break;
             default:

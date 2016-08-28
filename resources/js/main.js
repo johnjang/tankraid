@@ -5,19 +5,26 @@ var imgAddress = [];
 var enemySprites = [];
 var enemyBulletSprites = [];
 var bulletSprites = [];
+var bulletSprites
 var user = {
     image : 0,
     sprite : 0,
     locationx : 0,
     locationy : 0,
-    alive : false
+    alive : false,
+    bulletType : 0,
+    bulletInfo: {
+        t0 : [1, Date.now(), 200],
+        t1 : [10, Date.now(), 1500],
+        t2 : [10, Date.now(), 2000],
+        t3 : [10, Date.now(), 2500],
+    }
 };
 var level;
 var levelDate = Date.now();
 
 function loadResources() {
     //loading all the images
-    console.log("calling loadResources");
     imgAddress = [
         "resources/images/sprites.png",
         "resources/images/backgroundtile.bmp",
@@ -25,7 +32,7 @@ function loadResources() {
         "resources/images/mainTank.png",
         "resources/images/enemyTank.png",
         "resources/images/cursor.png",
-        "resources/images/bullet.bmp"
+        "resources/images/bullets.png"
 
     ];
     loadImages(imgAddress, loadGame, imageObjects);
@@ -104,33 +111,63 @@ function updateUser(dtr) {
         } 
     }
     if(input.isDown('1') == true) {
-        console.log("change shot 1");
+        user.bulletType = 0;
     }
     if(input.isDown('2') == true) {
-        console.log("change shot 2");
+        user.bulletType = 1;
     }
     if(input.isDown('3') == true) {
-        console.log("change shot 3");
+        user.bulletType = 2;
     }
     if(input.isDown('4') == true) {
-        console.log("change shot 4");
-    }
-    else {
-
+        user.bulletType = 3;      
     }
     user.sprite.render(ctx);
-
     if(cursor["click"] == true &&
-        (Date.now() - user.sprite.lastFired) > 1000) {
-
-        user.sprite.lastFired = Date.now();
-        var bulletImg = imageObjects["resources/images/bullet.bmp"];
+            (Date.now() - user.bulletInfo["t"+user.bulletType][1] > 
+                        user.bulletInfo["t"+user.bulletType][2]) &&
+                (user.bulletInfo["t"+user.bulletType][0] > 0)) {
+            
+        var bulletImg = imageObjects["resources/images/bullets.png"];
         var sx = user.sprite.position[0];
         var sy = user.sprite.position[1];
         var cx = cursor["cxPos"];
         var cy = cursor["cyPos"];
-        var bullet = new Sprite(bulletImg, [sx, sy], 100, 0, 
-                                [cx, cy], null, null, null, null, null);
+        var sizeW; var sizeH; var imageX; var imageY; var bullet;
+
+        user.bulletInfo["t"+user.bulletType][1] = Date.now();
+
+        switch(user.bulletType) {
+            case 0:
+                sizeW = 17;
+                sizeH = 12;
+                imageX = 1;
+                imageY = 7; 
+                break;
+            case 1:
+                sizeW = 12;
+                sizeH = 7;
+                imageX = 25;
+                imageY = 8;
+                user.bulletInfo["t"+user.bulletType][0] -= 1;
+                break;
+            case 2:
+                sizeW = 7;
+                sizeH = 7;
+                imageX = 47;
+                imageY = 7; 
+                user.bulletInfo["t"+user.bulletType][0] -= 1;
+                break;
+            case 3:
+                sizeW = 7;
+                sizeH = 13;
+                imageX = 87;
+                imageY =  5;
+                user.bulletInfo["t"+user.bulletType][0] -= 1;
+                break;
+        }
+        bullet = new Sprite(bulletImg, [sx, sy], 100, 0, [cx, cy],
+                            sizeW, sizeH, imageX, imageY, null);
 
         bullet.generateRandomLoc = false;
         bulletSprites.push(bullet);

@@ -17,8 +17,13 @@
         
         this.size = size;      //if size of the image
                                //needs to get bigger by a constant pixels
-        this.sizeWidth = sizeWidth;        
-        this.sizeHeight = sizeHeight;     
+        if(sizeWidth == null) {
+            this.sizeWidth = image.width;
+            this.sizeHeight = image.height;
+        } else {
+            this.sizeWidth = sizeWidth;        
+            this.sizeHeight = sizeHeight;     
+        }
 
         this.destination = destination;     //the final destination
         this.generateRandomLoc = true;     //for enemy sprites
@@ -34,10 +39,11 @@
         //draw itself on the canvas
         render : function(ctx) { 
             if(this.imageX == null) {
-                ctx.drawImage(this.image, this.position[0], this.position[1]);
+                ctx.drawImage(this.image, this.position[0]-this.image.width,
+                        this.position[1]);
             } else {
                 ctx.drawImage(this.image, this.imageX, this.imageY, this.sizeWidth,
-                                this.sizeHeight, this.position[0], this.poition[1],
+                                this.sizeHeight, this.position[0], this.position[1],
                                 this.sizeWidth, this.sizeHeight);
             }
         },
@@ -100,8 +106,8 @@
             
             var x1= this.position[0];
             var y1= this.position[1];
-            var c1= this.position[0]+10;//+this.sizeWidth;
-            var s1= this.position[1]+10;//+this.sizeHeight;
+            var c1= this.position[0]+this.sizeWidth;
+            var s1= this.position[1]+this.sizeHeight;
 
             return !(c <= x1 || x>c1 || s <= y1 || y>s1);
         }
