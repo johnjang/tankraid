@@ -13,6 +13,7 @@ var user = {
     alive : false
 };
 var level;
+var levelDate = Date.now();
 
 function loadResources() {
     //loading all the images
@@ -21,9 +22,9 @@ function loadResources() {
         "resources/images/sprites.png",
         "resources/images/backgroundtile.bmp",
         "resources/images/grid.bmp",
-        "resources/images/mainTank.bmp",
-        "resources/images/enemyTank.bmp",
-        "resources/images/cursor.bmp",
+        "resources/images/mainTank.png",
+        "resources/images/enemyTank.png",
+        "resources/images/cursor.png",
         "resources/images/bullet.bmp"
 
     ];
@@ -36,16 +37,14 @@ function loadResources() {
 function loadGame() {
 
     //making the main character.
-    user["image"] = imageObjects["resources/images/mainTank.bmp"];
+    user["image"] = imageObjects["resources/images/mainTank.png"];
     level = 0;  //initial level 0. Level increases every frame.
    
-    user.sprite = new Sprite(user.image, [238,367], 0, 81, 'S');
+    user.sprite = new Sprite(user.image, [238,367], 0, 0, null, 
+                                null, null,
+                                null, null, null);
 
-    var enemyTank = imageObjects["resources/images/enemyTank.bmp"];
-    enemySprites.push(new Sprite(enemyTank, [228, 103], 30, 41, null));
-    enemySprites.push(new Sprite(enemyTank, [100, 20], 10, 41, null));
-    enemySprites.push(new Sprite(enemyTank, [300, 200], 100, 41, null));
-    enemySprites.push(new Sprite(enemyTank, [400, 200], 200, 41, null));
+    var enemyTank = imageObjects["resources/images/enemyTank.png"];
     loop();
 }
 
@@ -61,7 +60,7 @@ function renderBackground() {
     ctx.fillStyle = ctx.createPattern(menuPanel, 'repeat');
     ctx.fillRect(0, 0+canvas.height-50, canvas.width, canvas.height);
     
-    var cursorImg = imageObjects["resources/images/cursor.bmp"];
+    var cursorImg = imageObjects["resources/images/cursor.png"];
     ctx.drawImage(cursorImg, cursor["xPos"]-cursorImg.width, 
                     cursor["yPos"]-cursorImg.height, cursorImg.width, 
                     cursorImg.height);
@@ -130,8 +129,8 @@ function updateUser(dtr) {
         var sy = user.sprite.position[1];
         var cx = cursor["cxPos"];
         var cy = cursor["cyPos"];
-        var bullet = new Sprite(bulletImg, [sx, sy], 50, 10, 
-                                           [cx, cy]);
+        var bullet = new Sprite(bulletImg, [sx, sy], 100, 0, 
+                                [cx, cy], null, null, null, null, null);
 
         bullet.generateRandomLoc = false;
         bulletSprites.push(bullet);
@@ -153,21 +152,30 @@ function updateBullets(dtr) {
     }
 }
 
-function update(dtr) {
-    renderBackground(); //always get the background first!!
-    updateUser(dtr);
-    updateBullets(dtr);
-    //updating enemy sprites
+function updateEnemy(dtr) {
+    //making enemy sprites
+    if(Date.now() -levelDate > 5000) {
+        levelDate = Date.now();
+        var enemyImg = imageObjects["resources/images/enemyTank.png"];
+        var points = generateRandomPoint();
+        var points2= generateRandomPoint();
+        var enemy = new Sprite(enemyImg, [points[0], points[1]], 50, null,
+                               [points2[0],points2[1]], null, null, null, null, null); 
+        enemySprites.push(enemy);
+    }
+
     for(var i=0; i<enemySprites.length; i++) {
         enemySprites[i].updateLocation2(dtr);
         enemySprites[i].render(ctx);
     }
-    //making enemy sprites
-    if(level > Math.random()) {
-        console.log("making enemy");
-    }
-    
-    //accesses global variables and checks collision
+}
+
+function update(dtr) {
+    renderBackground(); //always get the background first!!
+    updateUser(dtr);
+    updateEnemy(dtr);
+    updateBullets(dtr);
+     
     updateAllCollision();
     
 
@@ -187,6 +195,7 @@ var updateAllCollision = function() {
         enemySprite = enemySprites[i];
         for(var j=0; j<bulletSprites.length; j++) {
             if(enemySprite.checkCollision(bulletSprites[j])) {
+                console.log("collision happened");
                 //collision happened, destroy both objects
                 enemySprites.splice(i,1);
                 bulletSprites.splice(j,1);

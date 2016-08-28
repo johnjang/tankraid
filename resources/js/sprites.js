@@ -8,26 +8,38 @@
     // speed: the speed of sprites movement pixels/s
     // size: size of a sprite in pixels
     // destination: the place where sprite is going to
-    function Sprite(image, position, speed, size, destination) {
+    function Sprite(image, position, speed, size, destination, 
+                    sizeWidth, sizeHeight, imageX, imageY, frame) {
+        
         this.image = image;                 //Image object to hold iamge
         this.position = position;           //current position of sprite
         this.speed = speed;                 //movement speed of sprite
         
-        this.size = size;                   //size of the sprite
-        this.sizeWidth = 10;         //fix this later 
-        this.sizeHeight = 10;        //fix this later 
+        this.size = size;      //if size of the image
+                               //needs to get bigger by a constant pixels
+        this.sizeWidth = sizeWidth;        
+        this.sizeHeight = sizeHeight;     
 
-        this.destination = destination;     //the final destinayion
+        this.destination = destination;     //the final destination
         this.generateRandomLoc = true;     //for enemy sprites
         this.destinationReached = false;
         this.lastFired = Date.now();
+        this.frame = frame;     //if the image needs to change
+        this.imageX = imageX;
+        this.imageY = imageY;
     }
 
     Sprite.prototype = {
 
         //draw itself on the canvas
         render : function(ctx) { 
-            ctx.drawImage(this.image, this.position[0], this.position[1]);
+            if(this.imageX == null) {
+                ctx.drawImage(this.image, this.position[0], this.position[1]);
+            } else {
+                ctx.drawImage(this.image, this.imageX, this.imageY, this.sizeWidth,
+                                this.sizeHeight, this.position[0], this.poition[1],
+                                this.sizeWidth, this.sizeHeight);
+            }
         },
 
         //updates the current location depending on the final destination 
@@ -40,6 +52,9 @@
                 var newDest = generateRandomPoint();
                 this.destination[0] = newDest[0];
                 this.destination[1] = newDest[1];
+            } else if(this.destination == null &&
+                      this.generateRandomLoc == false) {
+                //do nothing
             }
             //If destination has been reached, it will stop or make
             // a new destination depending on generateRandomLoc variable
@@ -80,13 +95,13 @@
         checkCollision : function(sprite1) {
             var x = sprite1.position[0];
             var y = sprite1.position[1];
-            var c = sprite1.position[0]+sprite1.sizeWidth;
-            var s = sprite1.position[1]+sprite1.sizeHeight;
-
+            var c = sprite1.position[0]+10;//+sprite1.sizeWidth;
+            var s = sprite1.position[1]+10;//+sprite1.sizeHeight;
+            
             var x1= this.position[0];
             var y1= this.position[1];
-            var c1= this.position[0]+this.sizeWidth;
-            var s1= this.position[1]+this.sizeHeight;
+            var c1= this.position[0]+10;//+this.sizeWidth;
+            var s1= this.position[1]+10;//+this.sizeHeight;
 
             return !(c <= x1 || x>c1 || s <= y1 || y>s1);
         }
