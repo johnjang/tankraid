@@ -15,7 +15,6 @@ var generateRandomPoint = function() {
     return [xPos, yPos];
 };
 
-
 (function() {
     window.cursor = {
         xPos:0, //current mouse pos-xaxis

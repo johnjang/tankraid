@@ -3,6 +3,7 @@
 var imageObjects = {};
 var imgAddress = [];
 var enemySprites = [];
+var enemyBulletSprites = [];
 var bulletSprites = [];
 var user = {
     image : 0,
@@ -153,8 +154,7 @@ function updateBullets(dtr) {
 }
 
 function update(dtr) {
-    renderBackground();
-   
+    renderBackground(); //always get the background first!!
     updateUser(dtr);
     updateBullets(dtr);
     //updating enemy sprites
@@ -165,16 +165,38 @@ function update(dtr) {
     //making enemy sprites
     if(level > Math.random()) {
         console.log("making enemy");
-        var randomX;
-        var randomY;
-        var randomD;
-
     }
-
-    level += 0.000001;
+    
+    //accesses global variables and checks collision
+    updateAllCollision();
+    
 
 }
 
+var updateAllCollision = function() {
+    //check enemytank with user
+    //enemySprites vs user.sprite
+
+    //check enemybullets with user
+    //enemyBullets vs user.sprite
+
+
+    //check allybullets with enemytanks
+    //bulletSprites vs enemySprites
+    for(var i=0; i< enemySprites.length; i++) {
+        enemySprite = enemySprites[i];
+        for(var j=0; j<bulletSprites.length; j++) {
+            if(enemySprite.checkCollision(bulletSprites[j])) {
+                //collision happened, destroy both objects
+                enemySprites.splice(i,1);
+                bulletSprites.splice(j,1);
+                i--; j--;
+                //replace with an explosion
+            }
+        }
+    }
+
+}
 
 //cross platform
 var w = window;
