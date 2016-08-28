@@ -22,7 +22,8 @@ function loadResources() {
         "resources/images/grid.bmp",
         "resources/images/mainTank.bmp",
         "resources/images/enemyTank.bmp",
-        "resources/images/cursor.bmp"
+        "resources/images/cursor.bmp",
+        "resources/images/bullet.bmp"
 
     ];
     loadImages(imgAddress, loadGame, imageObjects);
@@ -40,10 +41,10 @@ function loadGame() {
     user.sprite = new Sprite(user.image, [238,367], 0, 81, 'S');
 
     var enemyTank = imageObjects["resources/images/enemyTank.bmp"];
-    enemySprites.push(new Sprite(enemyTank, [228, 103], 30, 41, 'N', null));
-    enemySprites.push(new Sprite(enemyTank, [100, 20], 10, 41, 'S', null));
-    enemySprites.push(new Sprite(enemyTank, [300, 200], 100, 41, 'E', null));
-    enemySprites.push(new Sprite(enemyTank, [400, 200], 200, 41, 'W', null));
+    enemySprites.push(new Sprite(enemyTank, [228, 103], 30, 41, null));
+    enemySprites.push(new Sprite(enemyTank, [100, 20], 10, 41, null));
+    enemySprites.push(new Sprite(enemyTank, [300, 200], 100, 41, null));
+    enemySprites.push(new Sprite(enemyTank, [400, 200], 200, 41, null));
     loop();
 }
 
@@ -68,78 +69,94 @@ function renderBackground() {
 }
 
 function updateUser(dtr) {
-    var userSpeed = 50;
+    var userSpeed = 150;
     var bulletSpeed = 200;
     if(input.isDown('LEFT') == true) {
         user.sprite.dir = 'W';
-        user.sprite.position[0] -= dtr*userSpeed;
+        if(user.sprite.position[0] < 0) {
+            //do nothing. out of bounds
+        } else {
+            user.sprite.position[0] -= dtr*userSpeed;
+        }
     }
     if(input.isDown('RIGHT') == true) {
         user.sprite.dir = 'E';
-        user.sprite.position[0] += dtr*userSpeed;
+        if(user.sprite.position[0] > canvas.width) {
+            //do nothing. out of bounds
+        } else {
+            user.sprite.position[0] += dtr*userSpeed;
+        }
     }
     if(input.isDown('DOWN') == true) {
         user.sprite.dir = 'S';
-        user.sprite.position[1] += dtr*userSpeed;
+        if(user.sprite.position[1] > canvas.height) {
+            //do nothing. out of bounds
+        } else {
+            user.sprite.position[1] += dtr*userSpeed;
+        }
     }
     if(input.isDown('UP') == true) {
         user.sprite.dir = 'N';
-        user.sprite.position[1] -= dtr*userSpeed;
+        if(user.sprite.position[1] < 0) {
+            //do nothing. out of bounds
+        } else {
+            user.sprite.position[1] -= dtr*userSpeed;
+        } 
     }
     if(input.isDown('1') == true) {
-        console.log("fire shot 1");
+        console.log("change shot 1");
     }
     if(input.isDown('2') == true) {
-        console.log("fire shot 2");
+        console.log("change shot 2");
     }
     if(input.isDown('3') == true) {
-        console.log("fire shot 3");
+        console.log("change shot 3");
     }
     if(input.isDown('4') == true) {
-        console.log("fire shot 4");
+        console.log("change shot 4");
     }
     else {
 
     }
     user.sprite.render(ctx);
 
-    if(cursor["click"] == true) {
-        console.log("fired, x:y = " + cursor["cxPos"] +
-                       ":" + cursor["cyPos"]);
-        console.log("fire shot");
-    //    var bullet = new Sprite("resources/images/cursor.bmp",
-    //                                [user.position[0], user.position[1]],
-    //                                bulletSpeed, 5,'');
-    //    bulletSprites.add(bullet);
-    }
+    if(cursor["click"] == true &&
+        (Date.now() - user.sprite.lastFired) > 1000) {
 
+        user.sprite.lastFired = Date.now();
+        var bulletImg = imageObjects["resources/images/bullet.bmp"];
+        var sx = user.sprite.position[0];
+        var sy = user.sprite.position[1];
+        var cx = cursor["cxPos"];
+        var cy = cursor["cyPos"];
+        var bullet = new Sprite(bulletImg, [sx, sy], 50, 10, 
+                                           [cx, cy]);
+
+        bullet.generateRandomLoc = false;
+        bulletSprites.push(bullet);
+    }
 }
 
-
-//a function to shoot from sprite's current position
-// sprite: Sprite object (the missile)
-// img: missile img
-// destination: x,y coordinates
-function shootFire(sprite, destination){
-    var sx = sprites.position[0];
-    var sy = sprites.position[1];
-    var dx = destination[0];
-    var dy = destination[1];
-
-    var xx = Math.pow((dx-sx), 2);
-    var yy = Math.pow((dy-sy), 2);
-    var di = Math.sqrt(xx+yy);
-    var mv = di/sprite.speed;
-    
-    sprite.position[0] = Math.floor((dx-sx)/mv);
-    sprite.position[1] = Math.floor((dy-sy)/mv);
-
+//go through an array of bullet sprites and update them all
+function updateBullets(dtr) {
+    for(var i=0; i<bulletSprites.length; i++) {
+        bullet = bulletSprites[i];
+        bullet.updateLocation2(dtr);
+        //check if it hit an object
+        if(bulletSprites[i].destinationReached == true) {
+            bulletSprites.splice(i, 1);
+            i--;
+        } else {
+            bulletSprites[i].render(ctx);
+        }
+    }
 }
 
 function update(dtr) {
     renderBackground();
    
     updateUser(dtr);
+    updateBullets(dtr);
     //updating enemy sprites
     for(var i=0; i<enemySprites.length; i++) {
         enemySprites[i].updateLocation2(dtr);

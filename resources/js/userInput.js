@@ -4,6 +4,7 @@ var ctx = canvas.getContext("2d");
 canvas.width = 1100;
 canvas.height = 550;
 canvas.style.cursor = "none";
+var boundary = [[0,0],[canvas.width,canvas.height]];
 document.body.appendChild(canvas);
 
 var generateRandomPoint = function() {
@@ -49,9 +50,6 @@ var generateRandomPoint = function() {
         var code = event.keyCode;
         var key;
         switch(code) {
-            case 32:
-                key = 'SPACE'; 
-                break;
             case 37:
                 key = 'LEFT'; 
                 break;
