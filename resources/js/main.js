@@ -1,9 +1,19 @@
 
-
-var imageObjects = {};
-var imgAddress = [];
 var enemySprites = [];
-var enemyBulletSprites = [];
+var enemyBulletSprites = []; //array that holds array of enemy bullet sprites
+var allyBulletSprites = {   //object that holds array of ally bullet sprites
+    t0 : [],
+    t1 : [],
+    t2 : [],
+    t3 : []
+};
+var itemSprites = { //array that holds item sprites
+    t1 : [],
+    t2 : [],
+    t3 : []
+
+};  
+var imageObjects = {};
 var bulletSprites = [];
 var bulletSprites
 var user = {
@@ -11,13 +21,13 @@ var user = {
     sprite : 0,
     locationx : 0,
     locationy : 0,
-    alive : false,
+    alive : true,
     bulletType : 0,
     bulletInfo: {
-        t0 : [1, Date.now(), 200],
-        t1 : [10, Date.now(), 1500],
-        t2 : [10, Date.now(), 2000],
-        t3 : [10, Date.now(), 2500],
+        t0 : [1, Date.now(), 2000],
+        t1 : [0, Date.now(), 500],
+        t2 : [0, Date.now(), 200],
+        t3 : [0, Date.now(), 3000],
     }
 };
 var level;
@@ -25,15 +35,14 @@ var levelDate = Date.now();
 
 function loadResources() {
     //loading all the images
-    imgAddress = [
-        "resources/images/sprites.png",
+    var imgAddress = [
         "resources/images/backgroundtile.bmp",
         "resources/images/grid.bmp",
         "resources/images/mainTank.png",
         "resources/images/enemyTank.png",
         "resources/images/cursor.png",
-        "resources/images/bullets.png"
-
+        "resources/images/bullets.png",
+        "resources/images/explosion.png"
     ];
     loadImages(imgAddress, loadGame, imageObjects);
 
@@ -123,17 +132,18 @@ function updateUser(dtr) {
         user.bulletType = 3;      
     }
     user.sprite.render(ctx);
+    var arrayBulletInfo = user.bulletInfo["t"+user.bulletType];
     if(cursor["click"] == true &&
-            (Date.now() - user.bulletInfo["t"+user.bulletType][1] > 
-                        user.bulletInfo["t"+user.bulletType][2]) &&
-                (user.bulletInfo["t"+user.bulletType][0] > 0)) {
+            (Date.now() - arrayBulletInfo[1] > 
+                        arrayBulletInfo[2]) &&
+                (arrayBulletInfo[0] > 0)) {
             
         var bulletImg = imageObjects["resources/images/bullets.png"];
         var sx = user.sprite.position[0];
         var sy = user.sprite.position[1];
         var cx = cursor["cxPos"];
         var cy = cursor["cyPos"];
-        var sizeW; var sizeH; var imageX; var imageY; var bullet;
+        var sizeW; var sizeH; var imageX; var imageY; var bullet; var speed;
 
         user.bulletInfo["t"+user.bulletType][1] = Date.now();
 
@@ -143,12 +153,14 @@ function updateUser(dtr) {
                 sizeH = 12;
                 imageX = 1;
                 imageY = 7; 
+                speed = 300;
                 break;
             case 1:
                 sizeW = 12;
                 sizeH = 7;
                 imageX = 25;
                 imageY = 8;
+                speed = 500;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 break;
             case 2:
@@ -156,37 +168,71 @@ function updateUser(dtr) {
                 sizeH = 7;
                 imageX = 47;
                 imageY = 7; 
+                speed = 600;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 break;
             case 3:
                 sizeW = 7;
                 sizeH = 13;
                 imageX = 87;
-                imageY =  5;
+                imageY = 5;
+                speed = 100;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 break;
         }
-        bullet = new Sprite(bulletImg, [sx, sy], 100, 0, [cx, cy],
+        bullet = new Sprite(bulletImg, [sx, sy], speed, 0, [cx, cy],
                             sizeW, sizeH, imageX, imageY, null);
 
         bullet.generateRandomLoc = false;
-        bulletSprites.push(bullet);
+        allyBulletSprites["t"+user.bulletType].push(bullet);
     }
 }
 
 //go through an array of bullet sprites and update them all
 function updateBullets(dtr) {
-    for(var i=0; i<bulletSprites.length; i++) {
-        bullet = bulletSprites[i];
-        bullet.updateLocation2(dtr);
-        //check if it hit an object
-        if(bulletSprites[i].destinationReached == true) {
-            bulletSprites.splice(i, 1);
-            i--;
+    //updating ally bullets first from t0 to t3
+    var arrayOfTypes = allyBulletSprites["t0"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        arrayOfTypes[i].updateLocation2(dtr);
+        if(arrayOfTypes[i].destinationReached == true) {
+            //do nothing
         } else {
-            bulletSprites[i].render(ctx);
+             arrayOfTypes[i].render(ctx);
         }
     }
+    arrayOfTypes = allyBulletSprites["t1"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        arrayOfTypes[i].updateLocation2(dtr);
+        if(arrayOfTypes[i].destinationReached == true) {
+            //do nothing
+        } else {
+             arrayOfTypes[i].render(ctx);
+        }
+    }
+    arrayOfTypes = allyBulletSprites["t2"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        arrayOfTypes[i].updateLocation2(dtr);
+        if(arrayOfTypes[i].destinationReached == true) {
+             arrayOfTypes.splice(i, 1);
+             i--;
+        } else {
+             arrayOfTypes[i].render(ctx);
+        }
+    }
+    arrayOfTypes = allyBulletSprites["t3"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        arrayOfTypes[i].updateLocation2(dtr);
+        if(arrayOfTypes[i].destinationReached == true) {
+             arrayOfTypes.splice(i, 1);
+             i--;
+        } else {
+             arrayOfTypes[i].render(ctx);
+        }
+    }
+
+    //updating enemy bullets
+
+
 }
 
 function updateEnemy(dtr) {
@@ -207,41 +253,147 @@ function updateEnemy(dtr) {
     }
 }
 
+function updateItems() {
+    for(var i=1; i<4; i++) {
+        var item = itemSprites["t"+i];
+        for(var j=0; j<item.length; j++) {
+            item[j].render(ctx);
+        }
+    }
+}
+
 function update(dtr) {
     renderBackground(); //always get the background first!!
     updateUser(dtr);
     updateEnemy(dtr);
     updateBullets(dtr);
+    updateItems();
      
     updateAllCollision();
     
+    if(user.alive == false) {
+        //end the game
+    }
 
 }
 
+//drops an item on the sprite's position randomly
+var randomDrop = function(sprite) {
+    var randomNum = Math.random();
+    var image = imageObjects["resources/images/bullets.png"];
+    if(randomNum < 0.3) {
+        //make t1 weapon, 30% chance
+        console.log("30% dropped");
+        var sprite = new Sprite(image,
+                    [sprite.position[0],sprite.position[1]], 0, 0, null,
+                    12, 7, 25, 8, null);
+        itemSprites["t1"].push(sprite);
+        
+    } else if (randomNum < 0.5) {
+        //make t2 weapon, 20% chance
+        console.log("20% dropped");
+        var sprite = new Sprite(image,
+                    [sprite.position[0],sprite.position[1]], 0, 0, null,
+                    7, 7, 47, 7, null);
+        itemSprites["t2"].push(sprite);
+        
+    } else if (randomNum < 0.6) {
+        //make t3 weapon, 10% chance
+        console.log("10% dropped");
+        var sprite = new Sprite(image,
+                    [sprite.position[0],sprite.position[1]], 0, 0, null,
+                    7, 13, 87, 5, null);
+        itemSprites["t3"].push(sprite);
+    }
+
+}
+
+
 var updateAllCollision = function() {
     //check enemytank with user
-    //enemySprites vs user.sprite
-
-    //check enemybullets with user
-    //enemyBullets vs user.sprite
-
-
-    //check allybullets with enemytanks
-    //bulletSprites vs enemySprites
-    for(var i=0; i< enemySprites.length; i++) {
-        enemySprite = enemySprites[i];
-        for(var j=0; j<bulletSprites.length; j++) {
-            if(enemySprite.checkCollision(bulletSprites[j])) {
-                console.log("collision happened");
-                //collision happened, destroy both objects
-                enemySprites.splice(i,1);
-                bulletSprites.splice(j,1);
-                i--; j--;
-                //replace with an explosion
+    for(var i=0; i<enemySprites.length; i++) {
+        if(enemySprites[i].checkCollision(user.sprite)) {
+            user.alive = false;
+        }
+    }
+   
+    //check items
+    for(var i=1; i<4; i++) {
+        var item = itemSprites["t"+i];
+        for(var j=0; j<item.length; j++) {
+            if(item[j].checkCollision(user.sprite)) {
+                user.bulletInfo["t"+i][0] += 10;
+                item.splice(j,1);
+                j--;
             }
         }
     }
 
+
+
+    var arrayOfTypes = itemSprites["t1"];
+
+    var arrayOfTypes = itemSprites["t2"];
+
+    var arrayOfTypes = itemSprites["t3"];
+
+
+
+    //checking all user bullets
+    var arrayOfTypes = allyBulletSprites["t0"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        if(arrayOfTypes[i].destinationReached == true) {
+            for(var j=0; j<enemySprites.length; j++) {
+                if(enemySprites[j].checkCollision(arrayOfTypes[i])) {
+                    randomDrop(enemySprites[j]);    //randomly drop item upon death
+                    enemySprites.splice(j,1);
+                    j--;
+                }
+            }
+            arrayOfTypes.splice(i,1)
+            i--;
+        }
+    }
+
+    arrayOfTypes = allyBulletSprites["t1"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        if(arrayOfTypes[i].destinationReached == true) {
+            for(var j=0; j<enemySprites.length; j++) {
+                if(enemySprites[j].checkCollision(arrayOfTypes[i])) {
+                    randomDrop(enemySprites[j]);    //randomly drop item upon death
+                    enemySprites.splice(j,1);
+                    j--;
+                }
+            }
+            arrayOfTypes.splice(i,1)
+            i--;
+        }
+    }
+
+    arrayOfTypes = allyBulletSprites["t2"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        for(var j=0; j<enemySprites.length &&
+                    arrayOfTypes[i]!=null; j++) {
+            if(enemySprites[j].checkCollision(arrayOfTypes[i])) {
+                randomDrop(enemySprites[j]);    //randomly drop item upon death
+                enemySprites.splice(j,1);
+                j--;
+                arrayOfTypes.splice(i,1);
+                i--;
+            }
+        }
+    }
+
+    arrayOfTypes = allyBulletSprites["t3"];
+    for(var i=0; i<arrayOfTypes.length; i++) {
+        for(var j=0; j<enemySprites.length; j++) {
+            if(enemySprites[j].checkCollision(arrayOfTypes[i])) {
+                randomDrop(enemySprites[j]);    //randomly drop item upon death
+                enemySprites.splice(j,1);
+                j--;
+            }
+        }
+    }
 }
 
 //cross platform
@@ -257,7 +409,12 @@ var loop = function() {
 
     update(delta/1000);
     then = now;
-    requestAnimationFrame(loop);
+    if(user.alive == true) {
+        requestAnimationFrame(loop);
+    }
+    else  {
+        //end game
+    }       
 }
 
 var then = Date.now();

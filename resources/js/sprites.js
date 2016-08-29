@@ -101,8 +101,8 @@
         checkCollision : function(sprite1) {
             var x = sprite1.position[0];
             var y = sprite1.position[1];
-            var c = sprite1.position[0]+10;//+sprite1.sizeWidth;
-            var s = sprite1.position[1]+10;//+sprite1.sizeHeight;
+            var c = sprite1.position[0]+sprite1.sizeWidth;
+            var s = sprite1.position[1]+sprite1.sizeHeight;
             
             var x1= this.position[0];
             var y1= this.position[1];
