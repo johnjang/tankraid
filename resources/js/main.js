@@ -24,10 +24,10 @@ var user = {
     alive : true,
     bulletType : 0,
     bulletInfo: {
-        t0 : [1, Date.now(), 2000],
-        t1 : [0, Date.now(), 500],
-        t2 : [0, Date.now(), 200],
-        t3 : [0, Date.now(), 3000],
+        t0 : [1, Date.now(), 2000], //always 1, dont change
+        t1 : [10, Date.now(), 500],
+        t2 : [10, Date.now(), 200],
+        t3 : [10, Date.now(), 3000],
     }
 };
 var level;
@@ -51,16 +51,12 @@ function loadResources() {
 }
 
 function loadGame() {
-
     //making the main character.
     user["image"] = imageObjects["resources/images/mainTank.png"];
-    level = 0;  //initial level 0. Level increases every frame.
    
-    user.sprite = new Sprite(user.image, [238,367], 0, 0, null, 
-                                null, null,
-                                null, null, null);
-
-    var enemyTank = imageObjects["resources/images/enemyTank.png"];
+    user.sprite = new Sprite(user.image, 0,0, user.image.width, user.image.height, 
+                                250, 250, 0, 0, 0, null, null);
+    user.sprite.generateRandomLoc = false;
     loop();
 }
 
@@ -89,34 +85,34 @@ function updateUser(dtr) {
     var bulletSpeed = 200;
     if(input.isDown('LEFT') == true) {
         user.sprite.dir = 'W';
-        if(user.sprite.position[0] < 0) {
+        if(user.sprite.dx < 0) {
             //do nothing. out of bounds
         } else {
-            user.sprite.position[0] -= dtr*userSpeed;
+            user.sprite.dx -= dtr*userSpeed;
         }
     }
     if(input.isDown('RIGHT') == true) {
         user.sprite.dir = 'E';
-        if(user.sprite.position[0] > canvas.width) {
+        if(user.sprite.dx > canvas.width) {
             //do nothing. out of bounds
         } else {
-            user.sprite.position[0] += dtr*userSpeed;
+            user.sprite.dx += dtr*userSpeed;
         }
     }
     if(input.isDown('DOWN') == true) {
         user.sprite.dir = 'S';
-        if(user.sprite.position[1] > canvas.height) {
+        if(user.sprite.dy > canvas.height) {
             //do nothing. out of bounds
         } else {
-            user.sprite.position[1] += dtr*userSpeed;
+            user.sprite.dy += dtr*userSpeed;
         }
     }
     if(input.isDown('UP') == true) {
         user.sprite.dir = 'N';
-        if(user.sprite.position[1] < 0) {
+        if(user.sprite.dy < 0) {
             //do nothing. out of bounds
         } else {
-            user.sprite.position[1] -= dtr*userSpeed;
+            user.sprite.dy -= dtr*userSpeed;
         } 
     }
     if(input.isDown('1') == true) {
@@ -139,51 +135,50 @@ function updateUser(dtr) {
                 (arrayBulletInfo[0] > 0)) {
             
         var bulletImg = imageObjects["resources/images/bullets.png"];
-        var sx = user.sprite.position[0];
-        var sy = user.sprite.position[1];
-        var cx = cursor["cxPos"];
-        var cy = cursor["cyPos"];
-        var sizeW; var sizeH; var imageX; var imageY; var bullet; var speed;
+        var dx = user.sprite.dx;
+        var dy = user.sprite.dy;
+        var destination = [cursor["cxPos"], cursor["cyPos"]];
+        var swidth; var sheight; var sx; var sy; var bullet; var speed;
 
         user.bulletInfo["t"+user.bulletType][1] = Date.now();
 
         switch(user.bulletType) {
             case 0:
-                sizeW = 17;
-                sizeH = 12;
-                imageX = 1;
-                imageY = 7; 
+                swidth= 17;
+                sheight = 12;
+                sx= 1;
+                sy= 7; 
                 speed = 300;
                 break;
             case 1:
-                sizeW = 12;
-                sizeH = 7;
-                imageX = 25;
-                imageY = 8;
+                swidth= 12;
+                sheight= 7;
+                sx= 25;
+                sy= 8;
                 speed = 500;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 break;
             case 2:
-                sizeW = 7;
-                sizeH = 7;
-                imageX = 47;
-                imageY = 7; 
+                swidth = 7;
+                sheight= 7;
+                sx= 47;
+                sy= 7; 
                 speed = 600;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 break;
             case 3:
-                sizeW = 7;
-                sizeH = 13;
-                imageX = 87;
-                imageY = 5;
+                swidth = 7;
+                sheight= 13;
+                sx= 87;
+                sy= 5;
                 speed = 100;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 break;
         }
-        bullet = new Sprite(bulletImg, [sx, sy], speed, 0, [cx, cy],
-                            sizeW, sizeH, imageX, imageY, null);
-
+        bullet = new Sprite(bulletImg, sx, sy, swidth, sheight, 
+                            dx, dy, 0, 0, speed, destination, null);
         bullet.generateRandomLoc = false;
+
         allyBulletSprites["t"+user.bulletType].push(bullet);
     }
 }
@@ -193,7 +188,7 @@ function updateBullets(dtr) {
     //updating ally bullets first from t0 to t3
     var arrayOfTypes = allyBulletSprites["t0"];
     for(var i=0; i<arrayOfTypes.length; i++) {
-        arrayOfTypes[i].updateLocation2(dtr);
+        arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
             //do nothing
         } else {
@@ -202,7 +197,7 @@ function updateBullets(dtr) {
     }
     arrayOfTypes = allyBulletSprites["t1"];
     for(var i=0; i<arrayOfTypes.length; i++) {
-        arrayOfTypes[i].updateLocation2(dtr);
+        arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
             //do nothing
         } else {
@@ -211,7 +206,7 @@ function updateBullets(dtr) {
     }
     arrayOfTypes = allyBulletSprites["t2"];
     for(var i=0; i<arrayOfTypes.length; i++) {
-        arrayOfTypes[i].updateLocation2(dtr);
+        arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
              arrayOfTypes.splice(i, 1);
              i--;
@@ -221,7 +216,7 @@ function updateBullets(dtr) {
     }
     arrayOfTypes = allyBulletSprites["t3"];
     for(var i=0; i<arrayOfTypes.length; i++) {
-        arrayOfTypes[i].updateLocation2(dtr);
+        arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
              arrayOfTypes.splice(i, 1);
              i--;
@@ -237,18 +232,19 @@ function updateBullets(dtr) {
 
 function updateEnemy(dtr) {
     //making enemy sprites
-    if(Date.now() -levelDate > 5000) {
+    if(Date.now() - levelDate > 5000) {
         levelDate = Date.now();
         var enemyImg = imageObjects["resources/images/enemyTank.png"];
         var points = generateRandomPoint();
         var points2= generateRandomPoint();
-        var enemy = new Sprite(enemyImg, [points[0], points[1]], 50, null,
-                               [points2[0],points2[1]], null, null, null, null, null); 
+        var enemy = new Sprite(enemyImg, 0, 0, enemyImg.width, enemyImg.height, 
+                                points[0], points[1], 0, 0, 50, points2, null);
+        enemy.generateRandomLoc = true;
         enemySprites.push(enemy);
     }
 
     for(var i=0; i<enemySprites.length; i++) {
-        enemySprites[i].updateLocation2(dtr);
+        enemySprites[i].updateLocation(dtr);
         enemySprites[i].render(ctx);
     }
 }
@@ -284,25 +280,25 @@ var randomDrop = function(sprite) {
     if(randomNum < 0.3) {
         //make t1 weapon, 30% chance
         console.log("30% dropped");
-        var sprite = new Sprite(image,
-                    [sprite.position[0],sprite.position[1]], 0, 0, null,
-                    12, 7, 25, 8, null);
+        var sprite = new Sprite(image, 25, 8, 12, 7, sprite.dx,
+                                sprite.dy, 0, 0, 0, null, 0);
+        sprite.generateRandomLoc = false;
         itemSprites["t1"].push(sprite);
         
     } else if (randomNum < 0.5) {
         //make t2 weapon, 20% chance
         console.log("20% dropped");
-        var sprite = new Sprite(image,
-                    [sprite.position[0],sprite.position[1]], 0, 0, null,
-                    7, 7, 47, 7, null);
+        var sprite = new Sprite(image, 47, 7, 7, 7, sprite.dx,
+                                sprite.dy, 0, 0, 0, null, 0);
+        sprite.generateRandomLoc = false;
         itemSprites["t2"].push(sprite);
         
     } else if (randomNum < 0.6) {
         //make t3 weapon, 10% chance
         console.log("10% dropped");
-        var sprite = new Sprite(image,
-                    [sprite.position[0],sprite.position[1]], 0, 0, null,
-                    7, 13, 87, 5, null);
+        var sprite = new Sprite(image, 87, 5, 7, 13, sprite.dx,
+                                sprite.dy, 0, 0, 0, null, 0);
+        sprite.generateRandomLoc = false;
         itemSprites["t3"].push(sprite);
     }
 

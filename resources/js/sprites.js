@@ -8,64 +8,39 @@
     // speed: the speed of sprites movement pixels/s
     // size: size of a sprite in pixels
     // destination: the place where sprite is going to
-    function Sprite(image, position, speed, size, destination, 
-                    sizeWidth, sizeHeight, imageX, imageY, frame) {
-        
-        this.image = image;                 //Image object to hold iamge
-        this.position = position;           //current position of sprite
-        this.speed = speed;                 //movement speed of sprite
-        
-        this.size = size;      //if size of the image
-                               //needs to get bigger by a constant pixels
-        if(sizeWidth == null) {
-            this.sizeWidth = image.width;
-            this.sizeHeight = image.height;
-        } else {
-            this.sizeWidth = sizeWidth;        
-            this.sizeHeight = sizeHeight;     
-        }
-
-        this.destination = destination;     //the final destination
-        this.generateRandomLoc = true;     //for enemy sprites
-        this.destinationReached = false;
-        this.lastFired = Date.now();
-        this.frame = frame;     //if the image needs to change
-        this.imageX = imageX;
-        this.imageY = imageY;
+    function Sprite(image, sx, sy, swidth, sheight, dx, dy, dxsize, dysize,
+                        speed, destination, frame) {
+       this.image = image;
+       this.sx = sx;
+       this.sy = sy;
+       this.swidth = swidth;
+       this.sheight = sheight;
+       this.dx = dx;
+       this.dy = dy;
+       this.dxsize = dxsize;
+       this.dysize = dysize;
+       this.speed = speed;
+       this.destination = destination;
+       this.frame = frame;
+       this.destinationReached = false;
+       this.generateRandomLoc = true;
     }
 
     Sprite.prototype = {
 
         //draw itself on the canvas
         render : function(ctx) { 
-            if(this.imageX == null) {
-                ctx.drawImage(this.image, this.position[0]-this.image.width,
-                        this.position[1]);
-            } else {
-                ctx.drawImage(this.image, this.imageX, this.imageY, this.sizeWidth,
-                                this.sizeHeight, this.position[0], this.position[1],
-                                this.sizeWidth, this.sizeHeight);
-            }
+                ctx.drawImage(this.image, this.sx, this.sy, this.swidth, this.sheight,
+                            this.dx-((this.dxsize+this.swidth)/2), 
+                            this.dy-((this.dysize+this.sheight)/2),
+                            this.swidth+this.dxsize,
+                            this.sheight+this.dysize);
         },
 
         //updates the current location depending on the final destination 
-        updateLocation2 : function(dtr) {
-            //If there is no destination, it will create a random destination
-            // unless generateRandomLoc is false
-            if(this.destination == null &&
-               this.generateRandomLoc == true) {
-                this.destination = [];
-                var newDest = generateRandomPoint();
-                this.destination[0] = newDest[0];
-                this.destination[1] = newDest[1];
-            } else if(this.destination == null &&
-                      this.generateRandomLoc == false) {
-                //do nothing
-            }
-            //If destination has been reached, it will stop or make
-            // a new destination depending on generateRandomLoc variable
-            else if(this.destination[0]==this.position[0] &&
-                    this.destination[1]==this.position[1] &&
+        updateLocation : function(dtr) {
+            if(this.destination[0]== this.dx &&
+                    this.destination[1]== this.dy &&
                     this.generateRandomLoc == true) {
                 var newDest = generateRandomPoint();
                 this.destination[0] = newDest[0];
@@ -74,8 +49,8 @@
             //If none of the above it will move to given destination
             else {
                 //di = sqrt((x2-x1)^2 + (y2-y1)^2)
-                var sx = this.position[0];
-                var sy = this.position[1];
+                var sx = this.dx;
+                var sy = this.dy;
                 var dx = this.destination[0];
                 var dy = this.destination[1];
                 var xx = Math.pow((dx-sx), 2);
@@ -84,35 +59,34 @@
 
                 //if the destination is less than two pixels away, just move
                 // to the destination right away
-                if(di < 2) {
-                    this.position[0] = this.destination[0];
-                    this.position[1] = this.destination[1];
+                if(di < 2.9) {
+                    this.dx= this.destination[0];
+                    this.dy = this.destination[1];
                     this.destinationReached = true;
                 } else {
                     var dix= (dx-sx)/di; //(x2-x1)/dist
                     var diy= (dy-sy)/di; //(y2-y1)/dist
-                    this.position[0] += (dix*dtr*this.speed);
-                    this.position[1] += (diy*dtr*this.speed);
+                    this.dx += (dix*dtr*this.speed);
+                    this.dy += (diy*dtr*this.speed);
                 }
             }
         },
-        //a helper function that checks collision of two sprites
-        //x,y: top left, c,s: bottom right
-        checkCollision : function(sprite1) {
-            var x = sprite1.position[0];
-            var y = sprite1.position[1];
-            var c = sprite1.position[0]+sprite1.sizeWidth;
-            var s = sprite1.position[1]+sprite1.sizeHeight;
-            
-            var x1= this.position[0];
-            var y1= this.position[1];
-            var c1= this.position[0]+this.sizeWidth;
-            var s1= this.position[1]+this.sizeHeight;
 
-            return !(c <= x1 || x>c1 || s <= y1 || y>s1);
-        }
+        //checks if each top left and bottom right collides with another 
+        // set of top left and bottom right.
+        checkCollision : function(sprite) {
+            //now check if each point is within the boundary
+            // Thank you mozilla 2D collision detection guide!
+            if( (this.dx+this.dxsize+this.swidth >= sprite.dx) &&
+                (this.dx <= sprite.dx+sprite.dxsize+sprite.swidth) &&
+                (this.dy+this.dysize+this.sheight >= sprite.dy) &&
+                (this.dy <= sprite.dy + sprite.sheight) ) {
+                return true;
+            } else {
+                return false;
+            }
+         }
     };
-  
+    
     window.Sprite = Sprite;
-    console.log("Sprites loaded");
 })();
