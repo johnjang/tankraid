@@ -1,15 +1,14 @@
 //create a canvas for the game
-var canvas = document.createElement("canvas");
+//var canvas = document.createElement("canvas");
+var canvas = document.getElementById("gameCanvas");
 var ctx = canvas.getContext("2d");
-canvas.width = 1100;
-canvas.height = 550;
-//canvas.style.cursor = "none";
+canvas.style.cursor = "none";
 var boundary = [[0,0],[canvas.width,canvas.height]];
 document.body.appendChild(canvas);
 
 var generateRandomPoint = function() {
-    var xPos = Math.random() * canvas.width-20; //random xPos inside a canvas
-    var yPos = Math.random() * canvas.height-20;    //random yPos inside a canvas
+    var xPos = Math.random() * (canvas.width-10); //random xPos inside the background
+    var yPos = Math.random() * (canvas.height-10-100);    //random yPos inside the background
     xPos = Math.floor(xPos);
     yPos = Math.floor(yPos);
     return [xPos, yPos];
@@ -50,27 +49,35 @@ var generateRandomPoint = function() {
         var key;
         switch(code) {
             case 37:
+            case 65:
                 key = 'LEFT'; 
                 break;
             case 38:
+            case 87:
                 key = 'UP'; 
                 break;
             case 39:
+            case 68:
                 key = 'RIGHT'; 
                 break;
             case 40:
+            case 83:
                 key = 'DOWN'; 
                 break;
             case 49:
+            case 97:
                 key = '1'; 
                 break;
             case 50:
+            case 98:
                 key = '2'; 
                 break;
             case 51:
+            case 99:
                 key = '3'; 
                 break;
             case 52:
+            case 100:
                 key = '4'; 
                 break;
             default:

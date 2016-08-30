@@ -19,7 +19,6 @@ function loadImages(imgAddress, callBackFunction, returnObject) {
         img.onload = function() {
             returnObject[address] = img;
             if(isReady()) {
-                console.log("initialLoad.js: all loaded");
                 callBackFunction();
             }
         };

@@ -2,15 +2,39 @@
 <html>
     <head>
         <title>TOWER_DEFENCE</title>
+        <link rel="stylesheet" src="main.css">
     </head>
 
     <body>
+        <canvas id="gameCanvas" width="1100" height="550" 
+                style="border:3px solid black">
+            Your Explorer doesn't support canvas, you don't have html5.
+        </canvas>
+
         <script type="text/javascript" src="resources/js/initialLoad.js"></script>
         <script type="text/javascript" src="resources/js/sprites.js"></script>
         <script type="text/javascript" src="resources/js/userInput.js"></script>
         <script type="text/javascript" src="resources/js/main.js"></script>
-    </body>
 
+
+        <p>Move with W,A,S,D. Click to SHOOT, press 1~4 to change weapon type</p>
+        <p>Weapon Information:</p>
+        <p> 1: explodes on location. slow. Infinite ammo</p>
+        <p> 2: explodes on location. fast. limited ammo</p>
+        <p> 3: shoots linearly. fast. limited ammo</p>
+        <p> 4: shoots linearly all the way. slow. limited ammo</p>
+
+        <p></p>
+        <p>CREDITS:</p>
+        <p>Game by: pbj</p>
+        <p>Graphic by: 
+            <a href="http://hasgraphics.com/hard-vacuum-tileset-and-sprites"
+                target="_blank">Daniel Cook</a></p>
+        <p>Special Thanks: mozilla tutorial site and
+            <a href="http://jlongster.com/Making-Sprite-based-Games-with-Canvas"
+                target="_blank">James</a></p>
+
+    </body>
 </html>
 
 

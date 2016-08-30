@@ -14,8 +14,7 @@ var itemSprites = { //array that holds item sprites
 
 };  
 var imageObjects = {};
-var bulletSprites = [];
-var bulletSprites
+var enemyKilled = 0;
 var user = {
     image : 0,
     sprite : 0,
@@ -67,12 +66,13 @@ function renderBackground() {
     var menuPanel = imageObjects["resources/images/grid.bmp"];
     
     ctx.fillStyle = ctx.createPattern(backGround, 'repeat');
-    ctx.fillRect(0, 0, canvas.width, canvas.height-50);
+    ctx.fillRect(0, 0, canvas.width, canvas.height-100);
 
     ctx.fillStyle = ctx.createPattern(menuPanel, 'repeat');
-    ctx.fillRect(0, 0+canvas.height-50, canvas.width, canvas.height);
+    ctx.fillRect(0, 0+canvas.height-100, canvas.width, canvas.height);
     
     var cursorImg = imageObjects["resources/images/cursor.png"];
+
     ctx.drawImage(cursorImg, cursor["xPos"]-cursorImg.width, 
                     cursor["yPos"]-cursorImg.height, cursorImg.width, 
                     cursorImg.height);
@@ -101,7 +101,7 @@ function updateUser(dtr) {
     }
     if(input.isDown('DOWN') == true) {
         user.sprite.dir = 'S';
-        if(user.sprite.dy > canvas.height) {
+        if(user.sprite.dy > canvas.height-95-user.sprite.image.height) {
             //do nothing. out of bounds
         } else {
             user.sprite.dy += dtr*userSpeed;
@@ -258,14 +258,78 @@ function updateItems() {
     }
 }
 
+function updateMenu() {
+    var image = imageObjects["resources/images/bullets.png"];
+    var type = user.bulletType;
+    //load all the static images/texts
+    ctx.fillStyle= 'red';
+    ctx.font = '30px customFont';   //custom font not working
+    ctx.fillText('WEAPON STATUS', 25, canvas.height-70);
+    var ep = 110;
+    //working on #1
+    ctx.font = '15px customFont';
+    ctx.fillText('1', 15, canvas.height-55);
+    ctx.drawImage(image, 1, 7, 17, 12, 10, canvas.height-30, 17, 12);
+    ctx.font = '10px customFont';
+    if(type == 0) { 
+        ctx.fillText('ACTIVE', 10+20, canvas.height-30);
+    } else {
+        ctx.fillText('INACTIVE', 10+20, canvas.height-30);
+    }
+    ctx.fillText('INF', 10+20, canvas.height-10);
+    //working on #2
+    ctx.font = '15px customFont';
+    ctx.fillText('2', 15+ep, canvas.height-55);
+    ctx.drawImage(image, 25, 8, 12, 7,2+10+ep, canvas.height-30, 12, 7);
+    ctx.font = '10px customFont';
+    if(type == 1) { 
+        ctx.fillText('ACTIVE', 30+ep, canvas.height-30);
+    } else {
+        ctx.fillText('INACTIVE', 30+ep, canvas.height-30);
+    }
+    ctx.fillText(user.bulletInfo["t1"][0], 30+ep, canvas.height-10);
+    //working on #3
+    ctx.font = '15px customFont';
+    ctx.fillText('3', 15+ep*2, canvas.height-55);
+    ctx.drawImage(image, 47, 7, 7, 7, 4+10+ep*2, canvas.height-30, 7, 7);
+
+    ctx.font = '10px customFont';
+    if(type == 2) { 
+        ctx.fillText('ACTIVE', 30+ep*2, canvas.height-30);
+    } else {
+        ctx.fillText('INACTIVE', 30+ep*2, canvas.height-30);
+    }
+    ctx.fillText(user.bulletInfo["t2"][0], 30+ep*2, canvas.height-10);
+
+    //working on #4
+    ctx.font = '15px customFont';
+    ctx.fillText('4', 15+ep*3, canvas.height-55);
+    ctx.drawImage(image, 87, 5, 7, 13, 5+10+ep*3, canvas.height-30, 7, 13);
+
+    ctx.font = '10px customFont';
+    if(type == 3) { 
+        ctx.fillText('ACTIVE', 30+ep*3, canvas.height-30);
+    } else {
+        ctx.fillText('INACTIVE', 30+ep*3, canvas.height-30);
+    }
+    ctx.fillText(user.bulletInfo["t3"][0], 30+ep*3, canvas.height-10);
+
+    //update score (enemies killed, boss killed etc)
+    ctx.font = '30px customFont';
+    ctx.fillText('SCORE', 850, canvas.height-70);
+    ctx.fillText(enemyKilled, 850, canvas.height-20);
+
+}
+
+
 function update(dtr) {
     renderBackground(); //always get the background first!!
     updateUser(dtr);
     updateEnemy(dtr);
     updateBullets(dtr);
     updateItems();
-     
     updateAllCollision();
+    updateMenu();
     
     if(user.alive == false) {
         //end the game
@@ -279,7 +343,6 @@ var randomDrop = function(sprite) {
     var image = imageObjects["resources/images/bullets.png"];
     if(randomNum < 0.3) {
         //make t1 weapon, 30% chance
-        console.log("30% dropped");
         var sprite = new Sprite(image, 25, 8, 12, 7, sprite.dx,
                                 sprite.dy, 0, 0, 0, null, 0);
         sprite.generateRandomLoc = false;
@@ -287,7 +350,6 @@ var randomDrop = function(sprite) {
         
     } else if (randomNum < 0.5) {
         //make t2 weapon, 20% chance
-        console.log("20% dropped");
         var sprite = new Sprite(image, 47, 7, 7, 7, sprite.dx,
                                 sprite.dy, 0, 0, 0, null, 0);
         sprite.generateRandomLoc = false;
@@ -295,7 +357,6 @@ var randomDrop = function(sprite) {
         
     } else if (randomNum < 0.6) {
         //make t3 weapon, 10% chance
-        console.log("10% dropped");
         var sprite = new Sprite(image, 87, 5, 7, 13, sprite.dx,
                                 sprite.dy, 0, 0, 0, null, 0);
         sprite.generateRandomLoc = false;
@@ -344,6 +405,7 @@ var updateAllCollision = function() {
                     randomDrop(enemySprites[j]);    //randomly drop item upon death
                     enemySprites.splice(j,1);
                     j--;
+                    enemyKilled++;
                 }
             }
             arrayOfTypes.splice(i,1)
@@ -359,6 +421,7 @@ var updateAllCollision = function() {
                     randomDrop(enemySprites[j]);    //randomly drop item upon death
                     enemySprites.splice(j,1);
                     j--;
+                    enemyKilled++;
                 }
             }
             arrayOfTypes.splice(i,1)
@@ -376,6 +439,7 @@ var updateAllCollision = function() {
                 j--;
                 arrayOfTypes.splice(i,1);
                 i--;
+                enemyKilled++;
             }
         }
     }
@@ -387,6 +451,7 @@ var updateAllCollision = function() {
                 randomDrop(enemySprites[j]);    //randomly drop item upon death
                 enemySprites.splice(j,1);
                 j--;
+                enemyKilled++;
             }
         }
     }
