@@ -6,8 +6,23 @@
     </head>
 
     <body>
+        <div id="tutorial"> 
+            <p>Move with W,A,S,D. right Click to SHOOT, press 1~4 to change weapon type</p>
+            <p>Weapon Information:</p>
+            <p> 1: explodes ON location. slow. Infinite ammo</p>
+            <p> 2: explodes ON location. fast. limited ammo</p>
+            <p> 3: shoots linearly. fast. limited ammo</p>
+            <p> 4: shoots linearly all the way. slow. limited ammo</p>
+            <p> Pick up items for extra ammo. Check out the credits at the bottom of the page </p>
+            <button onclick="start()">Start</button>
+        </div>
+    
+        <div id="restart" style="display:none">
+            <button onclick="start()">Try again</button>
+        </div>
+
         <canvas id="gameCanvas" width="1100" height="550" 
-                style="border:3px solid black">
+                style="border:3px solid black display: none" >
             Your Explorer doesn't support canvas, you don't have html5.
         </canvas>
 
@@ -17,25 +32,21 @@
         <script type="text/javascript" src="resources/js/main.js"></script>
 
 
-        <p>Move with W,A,S,D. Click to SHOOT, press 1~4 to change weapon type</p>
-        <p>Weapon Information:</p>
-        <p> 1: explodes on location. slow. Infinite ammo</p>
-        <p> 2: explodes on location. fast. limited ammo</p>
-        <p> 3: shoots linearly. fast. limited ammo</p>
-        <p> 4: shoots linearly all the way. slow. limited ammo</p>
 
         <p></p>
         <p>CREDITS:</p>
-        <p>Game by: pbj</p>
-        <p>Graphic by: 
+        <p>Game by: 
+            <a href="http://github.com/johnjang/tankraid" target="_blank">pbj</a></p>     
+        <p>Graphics by: 
             <a href="http://hasgraphics.com/hard-vacuum-tileset-and-sprites"
                 target="_blank">Daniel Cook</a></p>
-        <p>Special Thanks: mozilla tutorial site and
-            <a href="http://jlongster.com/Making-Sprite-based-Games-with-Canvas"
-                target="_blank">James</a></p>
+        <p>All Sound Effects by: 
+            <a href="http://soundimage.org"
+                target="_blank">Eric Matyas</a></p>
 
-        <p>Started the project on 2016 August 24th with no knowledge of javascript</p>
-        <p>Took me .... </p>
+        <p>Started the project on 2016 August 24th with no knowledge of javascript and 
+            finished on 2016 August 30th.</p>
+        <p>Last update: August 30th</p>
 
     </body>
 </html>

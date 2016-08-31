@@ -55,11 +55,11 @@
                 var dy = this.destination[1];
                 var xx = Math.pow((dx-sx), 2);
                 var yy = Math.pow((dy-sy), 2);
-                var di = Math.sqrt(xx+yy); //distance using above equation
+                var di = Math.floor(Math.sqrt(xx+yy)); //distance using above equation
 
                 //if the destination is less than two pixels away, just move
                 // to the destination right away
-                if(di < 2.9) {
+                if(di < 5) {
                     this.dx= this.destination[0];
                     this.dy = this.destination[1];
                     this.destinationReached = true;

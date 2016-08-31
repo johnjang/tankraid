@@ -1,10 +1,9 @@
 //create a canvas for the game
-//var canvas = document.createElement("canvas");
 var canvas = document.getElementById("gameCanvas");
+canvas.style.display = "block";
 var ctx = canvas.getContext("2d");
 canvas.style.cursor = "none";
 var boundary = [[0,0],[canvas.width,canvas.height]];
-document.body.appendChild(canvas);
 
 var generateRandomPoint = function() {
     var xPos = Math.random() * (canvas.width-10); //random xPos inside the background

@@ -3,6 +3,29 @@
 // imgAddress: array of string or a string of address containing the file
 // callBackFunction: Function to callback when loading all images are done
 // returnObject: the cache object where the images are stored
+//
+//
+
+function loadAudios(audAddress, callBackFunction, returnObject) {
+    var loaded = 0;
+    audAddress.forEach(function(address) {
+        loadAudio(address);
+    });
+    function loadAudio(address) {
+        var audio = new Audio();
+        audio.addEventListener('canplaythrough', isReady, false);
+        audio.src = address;
+        returnObject[address] = audio;
+    }
+    function isReady(){
+        loaded++;
+        if(loaded == audAddress.length) {
+            callBackFunction();
+        }
+    }
+}
+
+
 function loadImages(imgAddress, callBackFunction, returnObject) {
     //Check if the address is an array or a single address
     if(imgAddress instanceof Array) {
@@ -35,5 +58,4 @@ function loadImages(imgAddress, callBackFunction, returnObject) {
         }
         return true;
     }
-
 }
