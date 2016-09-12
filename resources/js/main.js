@@ -1,3 +1,7 @@
+//This file is where the actual game loop and all the other cool things happen
+//Last update: 9/8
+//Author: PBJ
+//******************************************************************************
 
 var enemySprites = [];
 var enemyBulletSprites = []; //array that holds array of enemy bullet sprites
@@ -26,9 +30,9 @@ var user = {
     bulletType : 0,
     bulletInfo: {
         t0 : [1, Date.now(), 900], //always 1, dont change
-        t1 : [0, Date.now(), 300],
-        t2 : [0, Date.now(), 100],
-        t3 : [0, Date.now(), 1000],
+        t1 : [10, Date.now(), 300],
+        t2 : [1000, Date.now(), 100],
+        t3 : [10, Date.now(), 1000],
     }
 };
 var level;
@@ -102,6 +106,24 @@ function renderBackground() {
 }
 
 function updateUser(dtr) {
+
+    //a little helper function for bullets that goes on straight linearly
+    //x,y = position user clicked
+    //x2,y2 = user's current position
+    function calculateEnd(x, y, x2, y2) {
+        //find slope
+        var xdes; var ydes;
+        var slope = (x-x2)/(y-y2);
+        //find the equation of line, y = mx + b, solve b
+        var b = y - slope*x;
+
+        //find direction
+        xdes = x2; ydes = y2;
+        
+       return [xdes, ydes]; 
+        
+    }
+
     var userSpeed = 150;
     var bulletSpeed = 200;
     if(input.isDown('LEFT') == true) {
@@ -158,11 +180,10 @@ function updateUser(dtr) {
         var bulletImg = imageObjects["resources/images/bullets.png"];
         var dx = user.sprite.dx;
         var dy = user.sprite.dy;
-        var destination = [cursor["cxPos"], cursor["cyPos"]];
         var swidth; var sheight; var sx; var sy; var bullet; var speed; var size;
 
         user.bulletInfo["t"+user.bulletType][1] = Date.now();
-
+        var destination; var linear = false;
         switch(user.bulletType) {
             case 0:
                 swidth= 17;
@@ -171,6 +192,7 @@ function updateUser(dtr) {
                 sy= 7; 
                 speed = 600;
                 size = 15;
+                destination = [cursor["xPos"]-swidth, cursor["yPos"]-sheight];
                 break;
             case 1:
                 swidth= 12;
@@ -180,6 +202,7 @@ function updateUser(dtr) {
                 speed = 900;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 size = 15;
+                destination = [cursor["xPos"]-swidth, cursor["yPos"]-sheight];
                 break;
             case 2:
                 swidth = 7;
@@ -189,6 +212,8 @@ function updateUser(dtr) {
                 speed = 1200;
                 size = 0;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
+                destination = [cursor["xPos"]-swidth, cursor["yPos"]-sheight];
+                linear = true;
                 break;
             case 3:
                 swidth = 7;
@@ -198,10 +223,12 @@ function updateUser(dtr) {
                 speed = 500;
                 user.bulletInfo["t"+user.bulletType][0] -= 1;
                 size = 40;
+                destination = [cursor["xPos"]-swidth, cursor["yPos"]-sheight];
+                linear = true;
                 break;
         }
         bullet = new Sprite(bulletImg, sx, sy, swidth, sheight, 
-                            dx, dy, size, size, speed, destination, null);
+                            dx, dy, size, size, speed, destination, null, linear);
         bullet.generateRandomLoc = false;
 
         allyBulletSprites["t"+user.bulletType].push(bullet);
@@ -224,6 +251,7 @@ function updateBullets(dtr) {
     }
     arrayOfTypes = allyBulletSprites["t1"];
     for(var i=0; i<arrayOfTypes.length; i++) {
+        console.log(i);
         arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
             explosionSprites.push([null, Date.now(), 
@@ -235,6 +263,7 @@ function updateBullets(dtr) {
     }
     arrayOfTypes = allyBulletSprites["t2"];
     for(var i=0; i<arrayOfTypes.length; i++) {
+        console.log(i);
         arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
              arrayOfTypes.splice(i, 1);
@@ -270,7 +299,8 @@ function updateEnemy(dtr) {
             var points = generateRandomPoint();
             var points2= generateRandomPoint();
             var enemy = new Sprite(enemyImg, 0, 0, enemyImg.width, enemyImg.height, 
-                                    points[0], 0, 0, 0, 100+enemyKilled*10, points2, null);
+                                    points[0], 0, 0, 0, 100+enemyKilled*10, points2, 
+                                    null, false);
             enemy.generateRandomLoc = true;
             enemySprites.push(enemy);
             currentEnemies++;
