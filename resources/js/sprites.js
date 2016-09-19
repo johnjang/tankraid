@@ -42,7 +42,7 @@
     }
 
     Sprite.prototype = {
-        //draw itself on the canvas
+        //draw itself on the canvas, ctx is canvas
         render : function(ctx) { 
                 ctx.drawImage(this.image, this.sx, this.sy, this.swidth, this.sheight,
                             this.dx-((this.dxsize+this.swidth)/2), 
@@ -50,6 +50,7 @@
                             this.swidth+this.dxsize,
                             this.sheight+this.dysize);
         },
+        //function to find the sprite's x and y velocity towards the destination
         findVelocity : function() {
             var sx = this.dx;
             var sy = this.dy;

@@ -3,26 +3,25 @@
 //Author: PBJ
 //******************************************************************************
 
-var then;
-var enemySprites = [];
-var enemyBulletSprites = []; //array that holds array of enemy bullet sprites
-var allyBulletSprites = {   //object that holds array of ally bullet sprites
-    t0 : [],
+var then;                   //time of last frame (for calculating sprit positions)
+var enemySprites = [];      //array of enemy sprites
+var allyBulletSprites = {   //object that holds array of ally bullet,
+    t0 : [],                // there are four types of bullets.
     t1 : [],
     t2 : [],
     t3 : []
 };
-var itemSprites = { //array that holds item sprites
+var itemSprites = {         //object that holds information of item objects
     t1 : [],
     t2 : [],
     t3 : []
 
 };  
-var explosionSprites = [];
-var imageObjects = {};
-var audioObjects = {};
-var enemyKilled = 0;
-var user = {
+var explosionSprites = [];  //will store up explosion states
+var imageObjects = {};      //stores all the loaded images
+var audioObjects = {};      //stores all the audio
+var enemyKilled = 0;        //current number of enemies killed
+var user = {                //User information/User's current state
     image : 0,
     sprite : 0,
     locationx : 0,
@@ -30,7 +29,8 @@ var user = {
     alive : true,
     bulletType : 0,
     bulletInfo: {
-        t0 : [1, Date.now(), 900], //always 1, dont change
+    //[initial number of bullets, time last shot, minimum time interval between shots]
+        t0 : [1, Date.now(), 900], //always 1, don't change the value
         t1 : [0, Date.now(), 300],
         t2 : [0, Date.now(), 100],
         t3 : [0, Date.now(), 1000],
@@ -251,7 +251,6 @@ function updateBullets(dtr) {
     }
     arrayOfTypes = allyBulletSprites["t1"];
     for(var i=0; i<arrayOfTypes.length; i++) {
-        console.log(i);
         arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
             explosionSprites.push([null, Date.now(), 
@@ -263,7 +262,6 @@ function updateBullets(dtr) {
     }
     arrayOfTypes = allyBulletSprites["t2"];
     for(var i=0; i<arrayOfTypes.length; i++) {
-        console.log(i);
         arrayOfTypes[i].updateLocation(dtr);
         if(arrayOfTypes[i].destinationReached == true) {
              arrayOfTypes.splice(i, 1);
