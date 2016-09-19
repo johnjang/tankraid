@@ -3,6 +3,7 @@
 //Author: PBJ
 //******************************************************************************
 
+var then;
 var enemySprites = [];
 var enemyBulletSprites = []; //array that holds array of enemy bullet sprites
 var allyBulletSprites = {   //object that holds array of ally bullet sprites
@@ -30,13 +31,12 @@ var user = {
     bulletType : 0,
     bulletInfo: {
         t0 : [1, Date.now(), 900], //always 1, dont change
-        t1 : [10, Date.now(), 300],
-        t2 : [1000, Date.now(), 100],
-        t3 : [10, Date.now(), 1000],
+        t1 : [0, Date.now(), 300],
+        t2 : [0, Date.now(), 100],
+        t3 : [0, Date.now(), 1000],
     }
 };
 var level;
-var levelDate = Date.now();
 var background;
 function loadResources() {
     var audioAddress = [
@@ -405,6 +405,7 @@ function updateMenu() {
     ctx.fillText(user.bulletInfo["t3"][0], 34+ep*3, canvas.height-10);
 
     //update score (enemies killed, boss killed etc)
+    ctx.fillStyle = 'green';
     ctx.font = '30px customFont';
     ctx.fillText('SCORE', 850, canvas.height-70);
     ctx.fillText(enemyKilled, 850, canvas.height-20);
@@ -652,14 +653,13 @@ var loop = function() {
                 t3 : [0, Date.now(), 1000],
             }
         };
-        levelDate = Date.now();
         //end game
     }       
 }
 
-var then = Date.now();
 
 var start = function() {
+    then = Date.now();
     var hide = document.getElementById('tutorial');
     hide.style.display ='none';
     hide = document.getElementById('restart');
