@@ -5,64 +5,53 @@
 //this file will handle everything related to facebook, including API calls
 // and related HTML functions
 
-//facebook web API information 
+
 window.fbAsyncInit = function() {
     FB.init({
         appId      : '682658948553810',
-        cookie     : true,
-        xfbml      : true,
-        version    : 'v2.7'
+        cookie     : true,  // enable cookies to allow the server to access 
+                            // the session
+        xfbml      : true,  // parse social plugins on this page
+        version    : 'v2.7' // use graph api version 2.5
     });
 };
 
-//load the SDK 
+// Load the SDK asynchronously
 (function(d, s, id) {
     var js, fjs = d.getElementsByTagName(s)[0];
-    if (d.getElementById(id)) {return;}
+    if (d.getElementById(id)) return;
     js = d.createElement(s); js.id = id;
     js.src = "//connect.facebook.net/en_US/sdk.js";
     fjs.parentNode.insertBefore(js, fjs);
 }(document, 'script', 'facebook-jssdk'));
 
-var loggedIn = false;
-//login to facebook
-//true if successful, false otherwise
-function facebookLogin() {
+
+var userInfo;
+function startLogin() {
     FB.login(function(response) {
         if(response.status === 'connected') {
-            console.log(response.name + " has connected" );
-            postOnWall();
+            console.log("logged in");
+            username = response.name;
+            post();
+
         } else if(response.status === 'not_authorized') {
-            return false;
-        } else {
-            return false;
+            console.log("not authorized");
+        } else  {
+            console.log("not logged in");
         }
-    });
+    }, {scope: 'publish_actions'} );
 }
 
-//this function will post mesage to user's timeline.
-//return true if successful, false otherwise
-function postOnWall() {
-    //check user status
-    FB.getLoginStatus(function(response) {
-        if(response.status === 'connected') {
-            console.log("connected to facebook");
-            console.log(response.name);
-            FB.api('/{682658948553810}/feed', 
-                "POST", 
-                {
-                    "message": response.name + fbmessage
-                },
-                function(response) {
-                    if (!response.error) {
-                        return true;
+function post() {
+    FB.api('/me/feed', 'post', {message: fbmessage}, 
+            function(response) {
+                if (response && !response.error) {
+                    alert("posted to facebook! check your wall!");
+                } else {
+                    alert("failed to post on the wall :S try again ");
                 }
-            });
-        } else {
-            return false;    
-        }
     });
+    start();
+    
 }
-
-
 
