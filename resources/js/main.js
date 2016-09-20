@@ -36,9 +36,12 @@ var user = {                //User information/User's current state
         t3 : [0, Date.now(), 1000],
     }
 };
-var level;
-var background;
+var background; //background music. This is a global variable because it will be played
+                // no matter what condition the game state is in
+
+//The function loads all the necessary resources (audios)
 function loadResources() {
+    //audio address
     var audioAddress = [
         "resources/sound/background.mp3",
         "resources/sound/enemySpawn.mp3",
@@ -53,8 +56,9 @@ function loadResources() {
 
 }
 
+//The function loads all the necessary resources (images)
 function loadResources2() {
-    //loading all the images
+    //image addresses
     var imgAddress = [
         "resources/images/backgroundtile.bmp",
         "resources/images/grid.bmp",
@@ -280,13 +284,10 @@ function updateBullets(dtr) {
              arrayOfTypes[i].render(ctx);
         }
     }
-
     //updating enemy bullets
-
-
 }
 
-var currentEnemies = 0;
+var currentEnemies = 0; //current number of enemies
 function updateEnemy(dtr) {
     //making enemy sprites
     var enemyImg = imageObjects["resources/images/enemyTank.png"];
@@ -443,9 +444,6 @@ function update(dtr) {
     updateAllCollision();
     updateMenu();
     
-    if(user.alive == false) {
-        //end the game
-    }
 
 }
 
@@ -603,7 +601,7 @@ requestAnimationFrame = w.requestAnimationFrame ||
                         w.webkitRequestAnimationFrame ||
                         w.msRequestAnimationFrame ||
                         w.mozRequestAnimationFrame;
-
+var fbmessage = " just scored 0 points on tank raid!";  
 var loop = function() {
     var now = Date.now();
     var delta = now - then;
@@ -614,8 +612,9 @@ var loop = function() {
         requestAnimationFrame(loop);
     }
     else  {
-        background.pause();
+        background.pause();     //pause the background music. not working currently
         var a = document.getElementById("restart");
+        fbmessage = " just scored " + enemyKilled + " points on tank raid!";  
         a.style.display = "block";
         currentEnemies = 0;
         exploding = [];
@@ -636,7 +635,7 @@ var loop = function() {
         explosionSprites = [];
         imageObjects = {};
         audioObjects = {};
-        enemyKilled = 0;
+        enemyKilled = 0;    //reset score to zero
         user = {
             image : 0,
             sprite : 0,
